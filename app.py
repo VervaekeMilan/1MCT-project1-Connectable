@@ -17,10 +17,11 @@ from helpers.rotary_encoder import rotary_encoder
 from helpers.Speaker import speaker
 from helpers.relay import relay
 from helpers.LCD import LCD
+from helpers.hbridge import hbridge
 # led1 = 21
 # knop1 = Button(20)
 
-
+###variables###
 counter = 0
 clkLastState = 0
 
@@ -28,20 +29,22 @@ min_temp_cooler = 4
 max_temp_cooler = 10
 temp_check_freq = 10
 
+###init_pins###
+
+#rotary encoder
 CLK = 20
 DT = 21
 rotary_encoder = rotary_encoder(CLK,DT)
 
+#speaker
 speaker_enable = 6
 speaker = speaker(speaker_enable)
 
+#cooler
 relay_enable = 16
 relay = relay(relay_enable)
 
-
-sensor_file_name = '/sys/bus/w1/devices/28-03079779a2f9/w1_slave'
-
-
+#lcd
 E = 24
 RS = 25
 SDA = 12
@@ -49,11 +52,22 @@ SCL = 23
 address = 112
 LCD = LCD(E, RS, SDA, SCL, address)
 
+#H-Bridge
+pin1 = 5
+pin2 = 22
+pin3 = 27
+pin4 = 17
+motor_enable = 6
+hbridge = hbridge(motor_enable,pin1, pin2, pin3, pin4)
+
+#temp file
+sensor_file_name = '/sys/bus/w1/devices/28-03079779a2f9/w1_slave'
 
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
 # GPIO.setup(led1, GPIO.OUT)
 
+###end_init_pins###
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'Hier mag je om het even wat schrijven, zolang het maar geheim blijft en een string is'
@@ -154,16 +168,41 @@ def find_ip():
     index = ip.find(' ')
     ip = (ip[2:index])
     LCD.write_message(ip)
+    print("IP visible")
+
+def close_cooler(): #anti-clockwise
+    print("closing cooler")
+    GPIO.output(pin1,GPIO.HIGH)
+    GPIO.output(pin3,GPIO.HIGH)
+    GPIO.output(pin2,GPIO.LOW)
+    GPIO.output(pin4,GPIO.LOW)
+
+def open_cooler(): #clockwise
+    print("opening cooler")
+    GPIO.output(pin2,GPIO.HIGH)
+    GPIO.output(pin4,GPIO.HIGH)
+    GPIO.output(pin1,GPIO.LOW)
+    GPIO.output(pin3,GPIO.LOW)
+
+def stop_moving_cooler():
+    print("pausing cooler movement")
+    GPIO.output(pin1,GPIO.HIGH)
+    GPIO.output(pin2,GPIO.HIGH)
+    GPIO.output(pin3,GPIO.HIGH)
+    GPIO.output(pin4,GPIO.HIGH)
 
 # knop1.on_press(lees_knop)
+#open_cooler()
 
+#close_cooler()
+
+#stop_moving_cooler()
 find_ip()
 rotary_encoder.on_turn(update_counter)
 threading.Thread(target=check_temp()).start
 
-# disable_device(speaker_enable)
-# time.sleep(5)
-# enable_device(speaker_enable)
+
+
 
 
 if __name__ == '__main__':

@@ -2,9 +2,6 @@
 from RPi import GPIO
 import time
 
-cursorB = True
-display = True
-
 instructions = {"display_on" : 0b00001100, "function_set" : 0b00111000,"clear_display" : 0b00000001}
 
 class LCD:
@@ -27,6 +24,7 @@ class LCD:
         self.send_instruction(instructions["function_set"])
         self.send_instruction(instructions["display_on"])
         self.send_instruction(instructions["clear_display"])
+        print("LCD initiated")
 
     def send_instruction(self, value):
         GPIO.output(self.RS,GPIO.LOW)
@@ -59,13 +57,13 @@ class LCD:
             GPIO.output(self.SDA,GPIO.HIGH)
    
             GPIO.output(self.SCL,GPIO.HIGH)
-
+            time.sleep(0.001)
             GPIO.output(self.SCL,GPIO.LOW)
         elif bit == False:
             GPIO.output(self.SDA,GPIO.LOW)
   
             GPIO.output(self.SCL,GPIO.HIGH)
-    
+            time.sleep(0.001)
             GPIO.output(self.SCL,GPIO.LOW)
 
     def ack(self):
@@ -105,4 +103,5 @@ class LCD:
         self.ack()
         self.stop_conditie()
         GPIO.output(self.E,GPIO.LOW)
+        time.sleep(0.01)
         GPIO.output(self.E,GPIO.HIGH)
