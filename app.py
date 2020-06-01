@@ -18,6 +18,8 @@ from helpers.Speaker import speaker
 from helpers.relay import relay
 from helpers.LCD import LCD
 from helpers.hbridge import hbridge
+from helpers.IR import IR
+from helpers.IR import IR
 # led1 = 21
 # knop1 = Button(20)
 
@@ -25,9 +27,14 @@ from helpers.hbridge import hbridge
 counter = 0
 clkLastState = 0
 
-min_temp_cooler = 4
-max_temp_cooler = 10
+min_temp_cooler = 15
+max_temp_cooler = 20
 temp_check_freq = 10
+
+is_cooler_open = False
+cooler_moving_time = 10
+
+devices = {16 : "cooler", 6 : "speakers"}
 
 ###init_pins###
 
@@ -59,6 +66,12 @@ pin3 = 27
 pin4 = 17
 motor_enable = 6
 hbridge = hbridge(motor_enable,pin1, pin2, pin3, pin4)
+
+#IR
+ir_signal = 13
+IR = IR(ir_signal)
+
+buttons = {"power" : 1100000000111111111010001001011101, "vol_up" : 1100000000111111110110001010011101, "vol_down" : 1100000000111111111010100001010111, "open_cooler" : 1100000000111111111110000000011111, "close_cooler" : 1100000000111111111001000001101111}
 
 #temp file
 sensor_file_name = '/sys/bus/w1/devices/28-03079779a2f9/w1_slave'
@@ -138,11 +151,11 @@ def update_counter(CLK):
     #volume speakers == counter
 
 def enable_device(pin):
-    print(f"Enabling device {pin}")
+    print(f"Enabling {devices[pin]}")
     GPIO.output(pin, GPIO.HIGH)
 
 def disable_device(pin):
-    print(f"Disabling device {pin}")
+    print(f"Disabling {devices[pin]}")
     GPIO.output(pin, GPIO.LOW)
 
 def check_temp():
@@ -153,13 +166,15 @@ def check_temp():
             pos = line.find('t')
             if pos != -1:
                 temp = (float(line[pos+2:]))/1000
-                
-                if temp <= min_temp_cooler:
-                    print(f"It's {temp} degrees celsius")
-                    #disable_device(relay_enable)
-                if temp >= max_temp_cooler:
-                    print(f"It's {temp} degrees celsius")
-                    #enable_device(relay_enable)
+                print(f"It's {temp} degrees celsius")
+                if temp <= min_temp_cooler :
+                    #print(f"It's {temp} degrees celsius")
+                    disable_device(relay_enable)
+                    
+                if temp >= max_temp_cooler and is_cooler_open == False:
+                    #print(f"It's {temp} degrees celsius")
+                    enable_device(relay_enable)
+                    
         sensor_file.close()
         time.sleep(temp_check_freq)
 
@@ -171,18 +186,35 @@ def find_ip():
     print("IP visible")
 
 def close_cooler(): #anti-clockwise
-    print("closing cooler")
-    GPIO.output(pin1,GPIO.HIGH)
-    GPIO.output(pin3,GPIO.HIGH)
-    GPIO.output(pin2,GPIO.LOW)
-    GPIO.output(pin4,GPIO.LOW)
+    global is_cooler_open
+    if is_cooler_open == True:
+        print("closing cooler")
+        GPIO.output(pin1,GPIO.HIGH)
+        GPIO.output(pin3,GPIO.HIGH)
+        GPIO.output(pin2,GPIO.LOW)
+        GPIO.output(pin4,GPIO.LOW)
+        time.sleep(cooler_moving_time)
+        stop_moving_cooler()
+        #threading.Timer(cooler_moving_time, stop_moving_cooler)
+        is_cooler_open = False
+    else: 
+        print("cooler is already closed")
 
 def open_cooler(): #clockwise
-    print("opening cooler")
-    GPIO.output(pin2,GPIO.HIGH)
-    GPIO.output(pin4,GPIO.HIGH)
-    GPIO.output(pin1,GPIO.LOW)
-    GPIO.output(pin3,GPIO.LOW)
+    global is_cooler_open
+    if is_cooler_open == False:
+        disable_device(16)
+        is_cooler_open = True
+        print("opening cooler")
+        GPIO.output(pin2,GPIO.HIGH)
+        GPIO.output(pin4,GPIO.HIGH)
+        GPIO.output(pin1,GPIO.LOW)
+        GPIO.output(pin3,GPIO.LOW)
+        time.sleep(cooler_moving_time)
+        stop_moving_cooler()
+        #threading.Timer(cooler_moving_time, stop_moving_cooler)
+    else: 
+        print("cooler is already open")
 
 def stop_moving_cooler():
     print("pausing cooler movement")
@@ -191,17 +223,31 @@ def stop_moving_cooler():
     GPIO.output(pin3,GPIO.HIGH)
     GPIO.output(pin4,GPIO.HIGH)
 
+def decode_IR_signal(ir_signal):
+    print("decoding IR signal")
+    binary = IR.get_binary()
+    code = binary
+    print(binary)
+    #if(binary == buttons["power"]):
+    if(binary == buttons["open_cooler"]):
+        threading.Thread(target=open_cooler()).start
+
+    elif(binary == buttons["close_cooler"]):
+        threading.Thread(target=close_cooler()).start
+
+    else: 
+        print("wrong code")
+
+
 # knop1.on_press(lees_knop)
-#open_cooler()
 
-#close_cooler()
-
-#stop_moving_cooler()
 find_ip()
+
 rotary_encoder.on_turn(update_counter)
-threading.Thread(target=check_temp()).start
+IR.on_ir_receive(decode_IR_signal)
 
-
+if is_cooler_open == False:
+    threading.Thread(target=check_temp()).start
 
 
 
