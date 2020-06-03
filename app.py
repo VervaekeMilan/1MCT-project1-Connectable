@@ -239,6 +239,10 @@ def decode_IR_signal(ir_signal):
     else: 
         print("wrong code")
     
+# def activate_speakers():
+#     enable_device(speaker_enable)
+#     speaker.play_music()
+
 
 # knop1.on_press(lees_knop)
 

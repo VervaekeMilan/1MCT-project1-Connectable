@@ -24,6 +24,8 @@ class speaker:
         pygame.mixer.music.play()
         while pygame.mixer.music.get_busy() == True:
             continue
+        if pygame.mixer.music.get_busy() == False:
+            self.play_music()
 
     def choose_track(self):
         self.rand_song = self.path + "/" + random.choice(os.listdir('music'))
