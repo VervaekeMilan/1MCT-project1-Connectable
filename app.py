@@ -252,7 +252,7 @@ def decode_IR_signal(ir_signal):
         threading.Thread(target=close_cooler())
     elif (binary == buttons["power"]):
         power_signal_recieved = True
-         print("power_signal_recieved press a num button to enable or disable a device")
+        print("power_signal_recieved press a num button to enable or disable a device")
     else: 
         print("wrong code")
 # def activate_speakers():
