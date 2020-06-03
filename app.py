@@ -245,6 +245,7 @@ def decode_IR_signal(ir_signal):
 
 #find_ip()
 enable_device(speaker_enable)
+speaker.play_music()
 # rotary_encoder.on_turn(update_counter)
 # IR.on_ir_receive(decode_IR_signal)
 
