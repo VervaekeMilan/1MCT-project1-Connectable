@@ -34,7 +34,7 @@ temp_check_freq = 10
 is_cooler_open = False
 cooler_moving_time = 10
 
-devices = {16 : "cooler", 6 : "speakers"}
+
 
 ###init_pins###
 
@@ -44,7 +44,7 @@ DT = 21
 rotary_encoder = rotary_encoder(CLK,DT)
 
 #speaker
-speaker_enable = 6
+speaker_enable = 19
 speaker = speaker(speaker_enable)
 
 #cooler
@@ -72,6 +72,8 @@ ir_signal = 13
 IR = IR(ir_signal)
 
 buttons = {"power" : 1100000000111111111010001001011101, "vol_up" : 1100000000111111110110001010011101, "vol_down" : 1100000000111111111010100001010111, "open_cooler" : 1100000000111111111110000000011111, "close_cooler" : 1100000000111111111001000001101111}
+
+devices = {relay_enable : "cooler", speaker_enable : "speakers"}
 
 #temp file
 sensor_file_name = '/sys/bus/w1/devices/28-03079779a2f9/w1_slave'
@@ -203,7 +205,7 @@ def close_cooler(): #anti-clockwise
 def open_cooler(): #clockwise
     global is_cooler_open
     if is_cooler_open == False:
-        disable_device(16)
+        disable_device(relay_enable)
         is_cooler_open = True
         print("opening cooler")
         GPIO.output(pin2,GPIO.HIGH)
@@ -237,17 +239,16 @@ def decode_IR_signal(ir_signal):
 
     else: 
         print("wrong code")
-
+    
 
 # knop1.on_press(lees_knop)
 
-find_ip()
+#find_ip()
+enable_device(speaker_enable)
+# rotary_encoder.on_turn(update_counter)
+# IR.on_ir_receive(decode_IR_signal)
 
-rotary_encoder.on_turn(update_counter)
-IR.on_ir_receive(decode_IR_signal)
-
-if is_cooler_open == False:
-    threading.Thread(target=check_temp()).start
+# threading.Thread(target=check_temp()).start
 
 
 
