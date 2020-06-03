@@ -237,7 +237,7 @@ def decode_IR_signal(ir_signal):
             global is_music_playing
             if is_music_playing == False:
                 enable_device(speaker_enable)
-                speaker.play_music()
+                threading.Thread(speaker.play_music()).start
                 is_music_playing == True
                 power_signal_recieved == False
             else:
@@ -256,13 +256,14 @@ def decode_IR_signal(ir_signal):
     else: 
         print("wrong code")
 
-def on_ir_receive():
-    print("IR call detection")
-    GPIO.add_event_detect(ir_signal, GPIO.FALLING, decode_IR_signal, bouncetime=150)
+# def on_ir_receive():
+#     print("IR call detection")
+#     GPIO.add_event_detect(ir_signal, GPIO.FALLING, decode_IR_signal, bouncetime=150)
     
-def on_turn():
-    print("Rotary Encoder call detection")
-    GPIO.add_event_detect(CLK, GPIO.FALLING, update_counter, bouncetime=1)
+# def on_turn():
+#     print("Rotary Encoder call detection")
+#     GPIO.add_event_detect(CLK, GPIO.FALLING, update_counter, bouncetime=1)
+
 # def activate_speakers():
 #     enable_device(speaker_enable)
 #     speaker.play_music()
@@ -272,11 +273,14 @@ def on_turn():
 
 find_ip()
 
-on_ir_receive()
-on_turn()
+IR.on_ir_receive(decode_IR_signal)
+rotary_encoder.on_turn(update_counter)
 
+#speaker.play_music()
 threading.Thread(target=check_temp()).start
-#threading.Thread(target=on_ir_receive()).start
+
+
+# threading.Thread(target=on_ir_receive()).start
 # threading.Thread(target=on_turn()).start
 
 if __name__ == '__main__':

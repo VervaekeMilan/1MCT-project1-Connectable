@@ -9,7 +9,9 @@ class IR:
         GPIO.setup(pin, GPIO.IN, GPIO.PUD_DOWN)
 
 
-
+    def on_ir_receive(self, callback):
+        print("IR call detection")
+        GPIO.add_event_detect(self.pin, GPIO.FALLING, callback, bouncetime=150)
 
     def get_binary(self):
         print("fetching IR code")

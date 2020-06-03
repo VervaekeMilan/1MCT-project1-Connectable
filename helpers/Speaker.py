@@ -27,6 +27,7 @@ class speaker:
         if pygame.mixer.music.get_busy() == False:
             self.play_music()
 
+    @staticmethod
     def stop_music():
         pygame.mixer.music.stop()
 
@@ -35,9 +36,9 @@ class speaker:
 
     def pause(self):
         if self.paused == False:
-            pygame.mixer.music.pause(self.rand_song)
+            pygame.mixer.music.pause()
         else:
-           pygame.mixer.music.unpause(self.rand_song)
+           pygame.mixer.music.unpause()
 
     @staticmethod
     def change_volume(counter):
