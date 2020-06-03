@@ -23,19 +23,6 @@ from helpers.IR import IR
 # led1 = 21
 # knop1 = Button(20)
 
-###variables###
-counter = 0
-clkLastState = 0
-
-min_temp_cooler = 15
-max_temp_cooler = 20
-temp_check_freq = 10
-
-is_cooler_open = False
-cooler_moving_time = 10
-
-
-
 ###init_pins###
 
 #rotary encoder
@@ -70,6 +57,18 @@ hbridge = hbridge(motor_enable,pin1, pin2, pin3, pin4)
 #IR
 ir_signal = 13
 IR = IR(ir_signal)
+
+
+###variables###
+counter = 6
+clkLastState = 0
+
+min_temp_cooler = 15
+max_temp_cooler = 20
+temp_check_freq = 10
+
+is_cooler_open = False
+cooler_moving_time = 10
 
 buttons = {"power" : 1100000000111111111010001001011101, "vol_up" : 1100000000111111110110001010011101, "vol_down" : 1100000000111111111010100001010111, "open_cooler" : 1100000000111111111110000000011111, "close_cooler" : 1100000000111111111001000001101111}
 
@@ -148,9 +147,9 @@ def update_counter(CLK):
         else:
             if counter != 0:
                 counter = counter - 1
-        print(counter)
+        #print(counter)
     CLK_state = clkLastState
-    #volume speakers == counter
+    speaker.change_volume(counter)
 
 def enable_device(pin):
     print(f"Enabling {devices[pin]}")
@@ -244,9 +243,9 @@ def decode_IR_signal(ir_signal):
 # knop1.on_press(lees_knop)
 
 #find_ip()
+rotary_encoder.on_turn(update_counter)
 enable_device(speaker_enable)
 speaker.play_music()
-# rotary_encoder.on_turn(update_counter)
 # IR.on_ir_receive(decode_IR_signal)
 
 # threading.Thread(target=check_temp()).start
