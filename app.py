@@ -69,8 +69,9 @@ temp_check_freq = 10
 
 is_cooler_open = False
 cooler_moving_time = 10
-
-buttons = {"power" : 1100000000111111111010001001011101, "vol_up" : 1100000000111111110110001010011101, "vol_down" : 1100000000111111111010100001010111, "open_cooler" : 1100000000111111111110000000011111, "close_cooler" : 1100000000111111111001000001101111}
+power_signal_recieved = False
+is_music_playing = False
+buttons = {"power" : 1100000000111111111010001001011101, "vol_up" : 1100000000111111110110001010011101, "vol_down" : 1100000000111111111010100001010111, "open_cooler" : 1100000000111111111110000000011111, "close_cooler" : 1100000000111111111001000001101111, "0" : 1100000000111111110110100010010111} #0 is speakers
 
 devices = {relay_enable : "cooler", speaker_enable : "speakers"}
 
@@ -229,16 +230,31 @@ def decode_IR_signal(ir_signal):
     binary = IR.get_binary()
     code = binary
     print(binary)
-    #if(binary == buttons["power"]):
+    global power_signal_recieved
+    if power_signal_recieved == True:
+       
+        if (binary == buttons["0"]):
+            global is_music_playing
+            if is_music_playing == False:
+                enable_device(speaker_enable)
+                threading.Thread(target=speaker.play_music())
+                is_music_playing == True
+                power_signal_recieved == False
+            else:
+                threading.Thread(target=speaker.stop_music())
+                is_music_playing = False
+                power_signal_recieved == False
+                
     if(binary == buttons["open_cooler"]):
-        threading.Thread(target=open_cooler()).start
+        threading.Thread(target=open_cooler())
 
     elif(binary == buttons["close_cooler"]):
-        threading.Thread(target=close_cooler()).start
-
+        threading.Thread(target=close_cooler())
+    elif (binary == buttons["power"]):
+        power_signal_recieved = True
+         print("power_signal_recieved press a num button to enable or disable a device")
     else: 
         print("wrong code")
-    
 # def activate_speakers():
 #     enable_device(speaker_enable)
 #     speaker.play_music()
@@ -246,13 +262,12 @@ def decode_IR_signal(ir_signal):
 
 # knop1.on_press(lees_knop)
 
-#find_ip()
+find_ip()
+IR.on_ir_receive(decode_IR_signal)
 rotary_encoder.on_turn(update_counter)
-enable_device(speaker_enable)
-speaker.play_music()
-# IR.on_ir_receive(decode_IR_signal)
 
-# threading.Thread(target=check_temp()).start
+
+threading.Thread(target=check_temp()).start
 
 
 
