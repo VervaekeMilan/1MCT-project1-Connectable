@@ -55,7 +55,7 @@ motor_enable = 6
 hbridge = hbridge(motor_enable,pin1, pin2, pin3, pin4)
 
 #IR
-ir_signal = 13
+ir_signal = 18
 IR = IR(ir_signal)
 
 
@@ -134,7 +134,7 @@ def switch_light(data):
 #     data = DataRepository.read_status_lamp_by_id("2")
 #     socketio.emit('B2F_verandering_lamp', {'lamp': data})
 
-@socketio.on('B2F_update_counter')
+#@socketio.on('B2F_update_counter')
 #rotary encoder
 def update_counter(CLK):
     global clkLastState
@@ -224,11 +224,11 @@ def stop_moving_cooler():
     GPIO.output(pin2,GPIO.HIGH)
     GPIO.output(pin3,GPIO.HIGH)
     GPIO.output(pin4,GPIO.HIGH)
+    #time.sleep(1)
 
 def decode_IR_signal(ir_signal):
     print("decoding IR signal")
     binary = IR.get_binary()
-    code = binary
     print(binary)
     global power_signal_recieved
     if power_signal_recieved == True:
@@ -256,7 +256,13 @@ def decode_IR_signal(ir_signal):
     else: 
         print("wrong code")
 
+def on_ir_receive():
+    print("IR call detection")
+    GPIO.add_event_detect(ir_signal, GPIO.FALLING, decode_IR_signal, bouncetime=150)
     
+def on_turn():
+    print("Rotary Encoder call detection")
+    GPIO.add_event_detect(CLK, GPIO.FALLING, update_counter, bouncetime=1)
 # def activate_speakers():
 #     enable_device(speaker_enable)
 #     speaker.play_music()
@@ -265,12 +271,13 @@ def decode_IR_signal(ir_signal):
 # knop1.on_press(lees_knop)
 
 find_ip()
-IR.on_ir_receive(decode_IR_signal)
-rotary_encoder.on_turn(update_counter)
+
+on_ir_receive()
+on_turn()
 
 threading.Thread(target=check_temp()).start
-
-
+#threading.Thread(target=on_ir_receive()).start
+# threading.Thread(target=on_turn()).start
 
 if __name__ == '__main__':
     socketio.run(app, debug=False, host='0.0.0.0')

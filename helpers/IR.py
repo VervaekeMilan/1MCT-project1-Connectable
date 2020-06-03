@@ -4,12 +4,11 @@ from datetime import datetime
 class IR:
     def __init__(self, pin):
         self.pin = pin
+        self.filter = 0
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(pin, GPIO.IN, GPIO.PUD_DOWN)
 
-    def on_ir_receive(self, call_method):
-        print("IR call detection")
-        GPIO.add_event_detect(self.pin, GPIO.FALLING, callback= call_method, bouncetime=150)
+
 
 
     def get_binary(self):
@@ -18,10 +17,9 @@ class IR:
         binary = 1
         code = []
         previous_value = 0
+        #value = GPIO.input(self.pin)
+        #while value:
         value = GPIO.input(self.pin)
-
-        while value:
-            value = GPIO.input(self.pin)
 
         start_time = datetime.now()
 
@@ -48,6 +46,6 @@ class IR:
                 else: binary *= 10
 
         if len(str(binary)) > 34:
-            binary = int(str(binary)[:34])
+            binary = int(str(binary)[0:34])
 
         return binary
