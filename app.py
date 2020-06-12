@@ -20,6 +20,9 @@ from helpers.LCD import LCD
 from helpers.hbridge import hbridge
 from helpers.IR import IR
 from helpers.IR import IR
+
+import pygame
+import os, random
 # led1 = 21
 # knop1 = Button(20)
 
@@ -55,22 +58,24 @@ motor_enable = 6
 hbridge = hbridge(motor_enable,pin1, pin2, pin3, pin4)
 
 #IR
-ir_signal = 18
+ir_signal = 13
 IR = IR(ir_signal)
 
 
 ###variables###
-counter = 6
+volume = 1
 clkLastState = 0
 
 min_temp_cooler = 15
-max_temp_cooler = 20
+max_temp_cooler = 18
 temp_check_freq = 10
+speaker_max_volume = 20
 
 is_cooler_open = False
 cooler_moving_time = 10
 power_signal_recieved = False
 is_music_playing = False
+
 buttons = {"power" : 1100000000111111111010001001011101, "vol_up" : 1100000000111111110110001010011101, "vol_down" : 1100000000111111111010100001010111, "open_cooler" : 1100000000111111111110000000011111, "close_cooler" : 1100000000111111111001000001101111, "0" : 1100000000111111110110100010010111} #0 is speakers
 
 devices = {relay_enable : "cooler", speaker_enable : "speakers"}
@@ -107,20 +112,20 @@ def initial_connection():
     socketio.emit('B2F_status_lampen', {'lampen': status})
 
 
-@socketio.on('F2B_switch_light')
-def switch_light(data):
-    print('licht gaat aan/uit')
-    lamp_id = data['lamp_id']
-    new_status = data['new_status']
-    # spreek de hardware aan
-    # stel de status in op de DB
-    res = DataRepository.update_status_lamp(lamp_id, new_status)
-    print(lamp_id)
-    if lamp_id == "2":
-        lees_knop(20)
-    # vraag de (nieuwe) status op van de lamp
-    data = DataRepository.read_status_lamp_by_id(lamp_id)
-    socketio.emit('B2F_verandering_lamp', {'lamp': data})
+# @socketio.on('F2B_switch_light')
+# def switch_light(data):
+#     print('licht gaat aan/uit')
+#     lamp_id = data['lamp_id']
+#     new_status = data['new_status']
+#     # spreek de hardware aan
+#     # stel de status in op de DB
+#     res = DataRepository.update_status_lamp(lamp_id, new_status)
+#     print(lamp_id)
+#     if lamp_id == "2":
+#         lees_knop(20)
+#     # vraag de (nieuwe) status op van de lamp
+#     data = DataRepository.read_status_lamp_by_id(lamp_id)
+#     socketio.emit('B2F_verandering_lamp', {'lamp': data})
 
 
 # def lees_knop(pin):
@@ -134,23 +139,23 @@ def switch_light(data):
 #     data = DataRepository.read_status_lamp_by_id("2")
 #     socketio.emit('B2F_verandering_lamp', {'lamp': data})
 
-#@socketio.on('B2F_update_counter')
+#@socketio.on('B2F_update_volume')
 #rotary encoder
-def update_counter(CLK):
+def update_volume(CLK):
     global clkLastState
-    global counter
+    global volume
     DT_state = GPIO.input(CLK)
     CLK_state = GPIO.input(DT)
     if CLK_state != clkLastState:
         if DT_state == 1:
-            if counter != 10:
-                counter = counter + 1
+            if volume != speaker_max_volume:
+                volume = volume + 1
         else:
-            if counter != 0:
-                counter = counter - 1
-        #print(counter)
+            if volume != 0:
+                volume = volume - 1
+        #print(volume)
     CLK_state = clkLastState
-    speaker.change_volume(counter)
+    speaker.change_volume(volume, speaker_max_volume)
 
 def enable_device(pin):
     print(f"Enabling {devices[pin]}")
@@ -231,19 +236,19 @@ def decode_IR_signal(ir_signal):
     binary = IR.get_binary()
     print(binary)
     global power_signal_recieved
-    if power_signal_recieved == True:
+    # if power_signal_recieved == True:
        
-        if (binary == buttons["0"]):
-            global is_music_playing
-            if is_music_playing == False:
-                enable_device(speaker_enable)
-                threading.Thread(speaker.play_music()).start
-                is_music_playing == True
-                power_signal_recieved == False
-            else:
-                speaker.stop_music()
-                is_music_playing = False
-                power_signal_recieved == False
+    #     if (binary == buttons["0"]):
+    #         global is_music_playing
+    #         if is_music_playing == False:
+    #             enable_device(speaker_enable)
+    #             threading.Thread(speaker.play_music()).start
+    #             is_music_playing == True
+    #             power_signal_recieved == False
+    #         else:
+    #             speaker.stop_music()
+    #             is_music_playing = False
+    #             power_signal_recieved == False
                 
     if(binary == buttons["open_cooler"]):
         open_cooler()
@@ -253,8 +258,40 @@ def decode_IR_signal(ir_signal):
     elif (binary == buttons["power"]):
         power_signal_recieved = True
         print("power_signal_recieved press a num button to enable or disable a device")
+
+    elif (binary == buttons["0"]):
+            global is_music_playing
+            global can_play_music
+            if is_music_playing == False:
+                enable_device(speaker_enable)
+                # speaker.play_music()
+                threading.Thread(target=play_music).start()
+                is_music_playing == True
+                power_signal_recieved == False
+            else:
+                speaker.stop_music()
+                is_music_playing = False
+                power_signal_recieved == False
     else: 
         print("wrong code")
+
+def play_music():
+    speaker.play_music()
+    # time.sleep(3)
+    # speaker.stop_music()
+
+#     print("Playing Audio")
+#     rand_song = choose_track()
+#     print(f"Playing {rand_song}")
+#     pygame.mixer.music.load(rand_song)
+#     pygame.mixer.music.play()
+#     while pygame.mixer.music.get_busy() == True:
+#         continue
+#     if pygame.mixer.music.get_busy() == False:
+#         play_music()
+
+# def choose_track():
+#     rand_song = "music" + "/" + random.choice(os.listdir('/home/pi/project1/music'))
 
 # def on_ir_receive():
 #     print("IR call detection")
@@ -262,7 +299,7 @@ def decode_IR_signal(ir_signal):
     
 # def on_turn():
 #     print("Rotary Encoder call detection")
-#     GPIO.add_event_detect(CLK, GPIO.FALLING, update_counter, bouncetime=1)
+#     GPIO.add_event_detect(CLK, GPIO.FALLING, update_volume, bouncetime=1)
 
 # def activate_speakers():
 #     enable_device(speaker_enable)
@@ -270,18 +307,20 @@ def decode_IR_signal(ir_signal):
 
 
 # knop1.on_press(lees_knop)
-
 find_ip()
 
+# threading.Thread(target=decode_IR_signal).start
 IR.on_ir_receive(decode_IR_signal)
-rotary_encoder.on_turn(update_counter)
+rotary_encoder.on_turn(update_volume)
 
-#speaker.play_music()
-threading.Thread(target=check_temp()).start
+# on_ir_receive()
+#threading.Thread(target=check_temp()).start
+check_temp()
+# speaker.play_music()
 
-
-# threading.Thread(target=on_ir_receive()).start
-# threading.Thread(target=on_turn()).start
+# play_music()
+#1000011111110010111
+#1100000000111111111110000000011111
 
 if __name__ == '__main__':
     socketio.run(app, debug=False, host='0.0.0.0')

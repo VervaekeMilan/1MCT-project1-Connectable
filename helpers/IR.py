@@ -47,7 +47,9 @@ class IR:
                 if time > 1000 : binary = binary *10 +1
                 else: binary *= 10
 
+
         if len(str(binary)) > 34:
             binary = int(str(binary)[0:34])
+
 
         return binary

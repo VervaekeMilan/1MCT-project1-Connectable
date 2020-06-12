@@ -13,7 +13,7 @@ class speaker:
         self.path = "music"
         self.paused = False
         self.rand_song = ""
-        self.volume = pygame.mixer.music.get_volume()
+        self.volume = pygame.mixer.music.set_volume(0.1)
         print("Speakers Initiated")
 
     def play_music(self):
@@ -27,13 +27,13 @@ class speaker:
         if pygame.mixer.music.get_busy() == False:
             self.play_music()
 
-    @staticmethod
-    def stop_music():
+
+    def stop_music(self):
         pygame.mixer.music.stop()
 
     def choose_track(self):
-        self.rand_song = self.path + "/" + random.choice(os.listdir('music'))
-
+        self.rand_song = self.path + "/" + random.choice(os.listdir('/home/pi/project1/music'))
+    
     def pause(self):
         if self.paused == False:
             pygame.mixer.music.pause()
@@ -41,6 +41,6 @@ class speaker:
            pygame.mixer.music.unpause()
 
     @staticmethod
-    def change_volume(counter):
-        pygame.mixer.music.set_volume(counter/10)
-        print(f"volume changed to {counter}/10")
+    def change_volume(counter, max_volume):
+        pygame.mixer.music.set_volume(counter/max_volume)
+        print(f"volume changed to {counter}/{str(max_volume)}")
