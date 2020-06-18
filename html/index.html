@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Connectable</title>
+    <link rel="stylesheet" href="style/screen.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+    <script src="script/app.js"></script>
+  </head>
+  <body>
+    <header class="o-row">
+      <div class="o-container">
+          <h1>
+              Connectable
+          </h1>
+      </div>
+    </header>
+    <section class="o-row">
+      <div class="o-container">
+        <div class="o-layout o-layout--gutter-sm">
+          <div class="o-layout__item u-flex-basis-auto">
+            <div class="u-max-width-sm">
+              <h2>
+                Cooler
+              </h2>
+            </div>
+          </div>
+          <div class="o-layout__item  u-1-of-2-bp3">
+            <div class="u-max-width-sm">
+              <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+            </div>
+          </div>
+        </div>
+    
+
+        <div class="o-layout">
+          <div class="o-layout__item u-1-of-3">
+            <div class="u-max-width-sm">
+              Compartment:
+            </div>
+          </div>
+          <div class="o-layout__item u-1-of-3">
+            <div class="u-max-width-sm">
+              <p class="c-type-md" >
+              Closed
+              </p>
+            </div>
+          </div>
+          <div class="o-layout__item u-1-of-3">
+            <div class="u-max-width-sm">
+              <p class="c-power-btn">
+                Stop
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="o-layout">
+          <div class="o-layout__item u-1-of-3">
+            <div class="u-max-width-sm">
+              State:
+            </div>
+          </div>
+          <div class="o-layout__item u-1-of-3">
+            <div class="u-max-width-sm">
+              <p class="c-type-md">
+                Cooling
+              </p>
+            </div>
+          </div>
+          <div class="o-layout__item u-1-of-3">
+            <div class="u-max-width-sm">
+              <p class="c-power-btn js-power-btn" >
+                Open
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+      
+    <section class="o-row">
+      <div class="o-container">
+        <a href="#!">
+            Temperature Curve
+        </a>
+        <div>
+          <figure>
+              <picture>
+                  <source srcset="img/chart@3x.png" media="(min-width: 992px)">
+                  <source srcset="img/chart@2x.png" media="(min-width: 576px)">
+                  <img src="img/chart.png" alt="Temperature curve">
+              </picture>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+     
+    <section class="o-row">
+      <div class="o-container">
+        <h2 class="c-type-md">
+          Speakers
+        </h2>
+
+        <div class="o-layout">
+          <div class="o-layout__item u-1-of-3">
+            <div class="u-max-width-sm">
+              Volume:
+            </div>
+          </div>
+          <div class="o-layout__item u-1-of-3">
+            <div class="u-max-width-sm">
+              <p class="c-type-md">
+              50%
+              </p>
+            </div>
+          </div> 
+          <div class="o-layout__item u-1-of-3">
+            <div class="u-max-width-sm">
+              <div class="c-power-btn c-power-btn-vol js-power-btn" >
+                 -
+              </div>
+            </div>
+              <!-- </div>
+            </div>
+          </div>
+          <div class="o-layout__item u-1-of-4"> -->
+            <div class="u-max-width-sm">
+              <div class="c-power-btn c-power-btn-vol js-power-btn" >
+
+                +
+           
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="o-layout">
+          <div class="o-layout__item u-1-of-3">
+            <div class="u-max-width-sm">
+              State:
+            </div>
+          </div>
+          <div class="o-layout__item u-1-of-3">
+            <div class="u-max-width-sm">
+              <p class="c-type-md">
+              Active
+              </p>
+            </div>
+          </div>
+          <div class="o-layout__item u-1-of-3">
+            <div class="u-max-width-sm">
+              <div class="c-power-btn js-power-btn" >
+                Turn Off
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="o-layout">
+          <div class="o-layout__item u-1-of-2-bp3">
+            <div class="u-max-width-sm">
+              Playing: Song_Title
+            </div>
+          </div>
+          
+        </div>
+      </div>
+    </section>
+    
+
+      <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+        width="205.000000pt" height="211.000000pt" viewBox="0 0 205.000000 211.000000"
+        preserveAspectRatio="xMidYMid meet">
+        <g transform="translate(0.000000,211.000000) scale(0.100000,-0.100000)"
+        fill="#003399" stroke="none">
+        <path d="M0 1952 l0 -162 58 0 c31 0 104 -7 162 -15 669 -90 1222 -539 1439
+        -1168 61 -178 101 -394 101 -552 l0 -55 145 0 145 0 0 208 c0 185 -3 217 -24
+        307 -96 394 -303 750 -597 1029 -353 336 -826 542 -1291 563 l-138 6 0 -161z"/>
+        <path d="M0 1310 l0 -160 43 0 c72 0 218 -28 310 -59 334 -114 595 -375 707
+        -709 34 -103 60 -241 60 -323 l0 -59 160 0 160 0 0 35 c0 20 -5 79 -10 133
+        -35 336 -184 647 -423 883 -190 188 -448 329 -697 383 -63 13 -249 36 -296 36
+        -11 0 -14 -30 -14 -160z"/>
+        <path d="M0 662 l0 -158 73 -12 c108 -18 187 -60 266 -140 91 -90 141 -201
+        141 -309 l0 -43 160 0 160 0 0 43 c0 73 -38 227 -74 303 -129 272 -365 438
+        -663 467 l-63 7 0 -158z"/>
+        </g>
+      </svg>
+
+
+
+
+        
+        <!-- <figure>
+          <picture>
+              <source srcset="img/chart@3x.png" media="(min-width: 992px)">
+              <source srcset="img/chart@2x.png" media="(min-width: 576px)">
+              <img src="img/circles.png" alt="Circles">
+          </picture>
+        </figure> -->
+      </div>
+    </section>
+  </body>
+</html>
+    <!-- <div>
+      <p>
+        test
+      </p>
+    </div>
+    <div class="o-container">
+      <article class="c-room js-room" data-idlamp="2">
+        <div class="c-room__name">
+          Keuken
+        </div>
+        <div class="c-room__icon">
+          <div class="c-fancy-bulb">
+            <div class="c-fancy-bulb__streaks c-fancy-bulb__streaks--left"></div>
+            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 275.3 413.3" enable-background="new 0 0 275.3 413.3" xml:space="preserve">
+              <g class="c-fancy-bulb__glass">
+                <path
+                  fill="#E2ECF1"
+                  d="M137.7,13.7C67.2,13.7,10,70.9,10,141.4c0,58.3,72.8,118.2,79.9,162.3h47.8h47.8
+                c7.1-44,79.9-103.9,79.9-162.3C265.3,70.9,208.2,13.7,137.7,13.7z"
+                />
+              </g>
+              <g class="c-fancy-bulb__light">
+                <path
+                  d="M137.7,13.7C67.2,13.7,10,70.9,10,141.4c0,58.3,72.8,118.2,79.9,162.3h47.8h47.8
+                c7.1-44,79.9-103.9,79.9-162.3C265.3,70.9,208.2,13.7,137.7,13.7z"
+                />
+              </g>
+
+              <g class="c-fancy-bulb__outline">
+                <path
+                  fill="#F1F2F2"
+                  stroke="#38434A"
+                  stroke-width="19.1022"
+                  stroke-miterlimit="10"
+                  d="M168.5,375.5h-61.7c-8.9,0-16-7.2-16-16
+                v-55.8h93.8v55.8C184.6,368.3,177.4,375.5,168.5,375.5z"
+                />
+                <path
+                  fill="#F1F2F2"
+                  stroke="#38434A"
+                  stroke-width="19.1022"
+                  stroke-miterlimit="10"
+                  d="M151.2,401.5h-27.1c-3.9,0-7-3.2-7-7v-19
+                h41.1v19C158.2,398.4,155.1,401.5,151.2,401.5z"
+                />
+                <line fill="none" stroke="#38434A" stroke-width="19.1022" stroke-miterlimit="10" x1="184.6" y1="339.6" x2="90.8" y2="339.6" />
+                <path
+                  fill="none"
+                  stroke="#38434A"
+                  stroke-width="19.1022"
+                  stroke-miterlimit="10"
+                  d="M137.7,13.7C67.2,13.7,10,70.9,10,141.4
+                c0,58.3,72.8,118.2,79.9,162.3h47.8h47.8c7.1-44,79.9-103.9,79.9-162.3C265.3,70.9,208.2,13.7,137.7,13.7z"
+                />
+              </g>
+              <g class="c-fancy-bulb__highlight">
+                <path
+                  fill="#FFDB55"
+                  stroke="#FFFFFF"
+                  stroke-width="21.0124"
+                  stroke-linecap="round"
+                  stroke-miterlimit="10"
+                  d="M207.1,89.5
+                c-12.3-16.1-28.4-29.1-46.9-37.8"
+                />
+                <path
+                  fill="#FFDB55"
+                  stroke="#FFFFFF"
+                  stroke-width="21.0124"
+                  stroke-linecap="round"
+                  stroke-miterlimit="10"
+                  d="M225,121.4
+                c-0.8-2.2-1.8-4.4-2.7-6.5"
+                />
+              </g>
+            </svg>
+            <div class="c-fancy-bulb__streaks c-fancy-bulb__streaks--right"></div>
+          </div>
+        </div>
+        <div class="c-room__control">
+          <div class="c-power-btn js-power-btn" data-idlamp="2" data-statuslamp="0">
+            Power
+          </div>
+        </div>
+      </article>
+    </div> -->

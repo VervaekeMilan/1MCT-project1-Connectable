@@ -1,5 +1,5 @@
 # pylint: skip-file
-from repositories.DataRepository import DataRepository
+#from repositories.DataRepository import DataRepository
 from flask import Flask, jsonify
 from flask_socketio import SocketIO
 from flask_cors import CORS
@@ -66,8 +66,8 @@ IR = IR(ir_signal)
 volume = 1
 clkLastState = 0
 
-min_temp_cooler = 15
-max_temp_cooler = 18
+min_temp_cooler = 20
+max_temp_cooler = 21
 temp_check_freq = 10
 speaker_max_volume = 20
 
@@ -76,7 +76,7 @@ cooler_moving_time = 10
 power_signal_recieved = False
 is_music_playing = False
 
-buttons = {"power" : 1100000000111111111010001001011101, "vol_up" : 1100000000111111110110001010011101, "vol_down" : 1100000000111111111010100001010111, "open_cooler" : 1100000000111111111110000000011111, "close_cooler" : 1100000000111111111001000001101111, "0" : 1100000000111111110110100010010111} #0 is speakers
+buttons = {"power" : 1100000000111111111010001001011101, "vol_up" : 1100000000111111110110001010011101, "vol_down" : 1100000000111111111010100001010111, "open_cooler" : 1100000000111111111110000000011111, "close_cooler" : 1100000000111111111001000001101111, "0" : 1100000000111111110110100010010111, "1": 1100000000111111110011000011001111} #0 is speakers
 
 devices = {relay_enable : "cooler", speaker_enable : "speakers"}
 
@@ -158,11 +158,11 @@ def update_volume(CLK):
     speaker.change_volume(volume, speaker_max_volume)
 
 def enable_device(pin):
-    print(f"Enabling {devices[pin]}")
+    #print(f"Enabling {devices[pin]}")
     GPIO.output(pin, GPIO.HIGH)
 
 def disable_device(pin):
-    print(f"Disabling {devices[pin]}")
+    #print(f"Disabling {devices[pin]}")
     GPIO.output(pin, GPIO.LOW)
 
 def check_temp():
@@ -173,7 +173,8 @@ def check_temp():
             pos = line.find('t')
             if pos != -1:
                 temp = (float(line[pos+2:]))/1000
-                print(f"It's {temp} degrees celsius")
+                # print(f"It's {temp} degrees celsius")
+                print(temp)
                 if temp <= min_temp_cooler :
                     #print(f"It's {temp} degrees celsius")
                     disable_device(relay_enable)
@@ -188,7 +189,10 @@ def check_temp():
 def find_ip():
     ip = str(check_output(['hostname', '--all-ip-addresses']))
     index = ip.find(' ')
-    ip = (ip[2:index])
+    ip = (ip[index+1:])
+    index = ip.find(' ')
+    ip = (ip[0:index])
+    #print(ip)
     LCD.write_message(ip)
     print("IP visible")
 
@@ -272,6 +276,8 @@ def decode_IR_signal(ir_signal):
                 speaker.stop_music()
                 is_music_playing = False
                 power_signal_recieved == False
+    elif (binary == buttons["1"]):
+        find_ip()
     else: 
         print("wrong code")
 
